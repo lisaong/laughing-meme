@@ -32,4 +32,5 @@ parser.add_argument('--search_count', '-s', help='max number of files to search'
     type=int, default=100)
 args = parser.parse_args()
 result = find_files(args.path, args.count, args.search_count)
-print(result.items())
+for r in result.items():
+    print(r[1])
