@@ -1,1 +1,1 @@
-"# Random scripts" 
+# Random scripts
