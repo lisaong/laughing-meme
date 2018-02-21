@@ -1,7 +1,4 @@
 # Dockerfile for a barebones NodeJS sample application
-# References:
-#   https://github.com/jatins/express-hello-world/blob/master/Dockerfile
-#   https://github.com/heroku/node-js-sample
 
 FROM node:9.5.0
 
