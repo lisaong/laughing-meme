@@ -24,7 +24,7 @@ def convert(root_path):
         word.ActiveDocument.SaveAs(
             docx_path, FileFormat=constants.wdFormatXMLDocument)
         doc.Close(False)
-        print("{} -> {}".format(path, docx_path))
+        print("{} -> {}".format(doc_path, docx_path))
 
     # Create list of paths to .doc files
     for path in glob.glob("{}/**/*.doc".format(root_path),
