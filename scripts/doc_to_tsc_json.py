@@ -24,12 +24,10 @@ def jsonify_top_level_table(root_path):
         def as_json(self):
             "returns the TSC as a json object"
 
-        def _extract_row(self, row):
-            "returns row data as a tuple of header, data"
+        def _row_data(self, row):
+            "returns row data"
             HEADER_COLUMN = 0
-            header = row.cells[HEADER_COLUMN].text
-            data = [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
-            return (header, data)
+            return [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
 
         def _extract(self):
             """Extracts information from a docx table:
@@ -42,13 +40,36 @@ def jsonify_top_level_table(root_path):
                     Abilities (list)
                     Range of Applications (list)
             """
-            # doc-format specific constants
-            CATEGORY_ROW = 0
-            NAME_ROW = 1
+            # Row indices in the docx table
+            INDICES = ["category", "name", "description",
+                "prof.level", "prof.code", "prof.desc",
+                "prof.knowledge",  "prof.abilities", "prof.apps"]
+
             rows = self.table.rows
 
-            self.name = self._extract_row(rows[NAME_ROW])
-            self.category = self._extract_row(rows[CATEGORY_ROW])
+            self.name = self._row_data(rows[INDICES.index("name")])
+            self.description = self._row_data(rows[INDICES.index("description")])
+
+            # drop the repeated category cells
+            self.category = self._row_data(rows[INDICES.index("category")])[0]
+
+            # proficiency rows
+            prof_level = self._row_data(rows[INDICES.index("prof.level")])
+            prof_code = self._row_data(rows[INDICES.index("prof.code")])
+            prof_desc = self._row_data(rows[INDICES.index("prof.desc")])
+            prof_knowledge = self._row_data(rows[INDICES.index("prof.knowledge")])
+            prof_abilities = self._row_data(rows[INDICES.index("prof.abilities")])
+            prof_apps = self._row_data(rows[INDICES.index("prof.apps")])
+
+            # match naming to the document
+            self.proficiencies = [{ "level" : level, "TSC code" : code, \
+                "TSC Proficiency Description" : desc, "Knowledge" : knowledge, \
+                "Abilities" : abilities, "Range of Applications" : apps} \
+                    for level, code, desc, knowledge, abilities, apps in \
+                        zip(prof_level, prof_code, prof_desc, prof_knowledge,
+                            prof_abilities, prof_apps)
+            ]
+
 
     def get_top_level_table(path):
         "Returns the top level table in the document, if any"
