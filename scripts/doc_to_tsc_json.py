@@ -8,7 +8,7 @@ import os
 # pip install python-docx
 import docx
 
-def jsonify_tscs(root_path, json_outfile):
+def jsonify_tscs(root_path, json_outfile, json_format):
     """Extracts TSCs from multiple docx files into a json file"""
 
     class Tsc:
@@ -60,6 +60,7 @@ def jsonify_tscs(root_path, json_outfile):
 
     class TscEncoder(json.JSONEncoder):
         "Extends JSON encoding for a TSC"
+        # Suppress false positive pylint "hidden" warning
         def default(self, obj):  # pylint: disable=E0202
             if isinstance(obj, Tsc):
                 return {
@@ -72,7 +73,25 @@ def jsonify_tscs(root_path, json_outfile):
 
             # Let the base class default method raise the TypeError
             return json.JSONEncoder.default(self, obj)
-            
+
+    class FlatTscEncoder(json.JSONEncoder):
+        "Extends JSON encoding for a list of TSCs, flattened into proficiencies"
+        # Suppress false positive pylint "hidden" warning
+        def default(self, obj):  # pylint: disable=E0202
+            if all(isinstance(n, Tsc) for n in obj):
+                # we want a flat list and not nested lists
+                result = []
+                for tsc in obj:
+                    result += [{
+                        "TSC Name" : tsc.name,
+                        "TSC Category" : tsc.category,
+                        "TSC Description" : tsc.description,
+                        **p} for p in tsc.proficiencies]
+                return result
+
+            # Let the base class default method raise the TypeError
+            return json.JSONEncoder.default(self, obj)
+
     def get_top_level_table(path):
         "Returns the top level table in the document, if any"
         try:
@@ -81,7 +100,7 @@ def jsonify_tscs(root_path, json_outfile):
                 print(path)
                 return doc.tables[0]
         except:
-            print("Warning: Skipping {}".format(path))
+            print("WARNING: Skipping invalid document {}".format(path))
         return None
 
     # main logic
@@ -93,16 +112,24 @@ def jsonify_tscs(root_path, json_outfile):
             tscs.append(Tsc(table))
 
     with open(json_outfile, mode='w') as o:
-        o.write(json.dumps(tscs, cls=TscEncoder, indent=4,
+        if json_format == "tabular":
+            encoder = FlatTscEncoder
+        else:
+            encoder = TscEncoder
+        o.write(json.dumps(tscs, cls=encoder, indent=4,
             ensure_ascii=True))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Converts the top level table in a .docx to JSON.'
-        "This JSON can be read by something like http://www.jsondata.ninja/")
+        description='Converts the top level table in a .docx to JSON.')
     parser.add_argument('path',
         help='folder path to look for .docx files')
     parser.add_argument('--outfile',
-        help="output file path", default="skillsmap_tscs.json")
+        help="output file path (default: skillsmap_tscs.json)",
+        default="skillsmap_tscs.json")
+    parser.add_argument('--format',
+        help="determines the json output format (default: nested)",
+        choices=["nested", "tabular"],
+        default="nested")
     args = parser.parse_args()
-    jsonify_tscs(args.path, args.outfile)
+    jsonify_tscs(args.path, args.outfile, args.format)
