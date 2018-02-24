@@ -8,8 +8,8 @@ import os
 # pip install python-docx
 import docx
 
-def jsonify_top_level_table(root_path):
-    """Converts the top level table of a docx to json"""
+def jsonify_tscs(root_path, json_outfile):
+    """Extracts TSCs from multiple docx files into a json file"""
 
     class Tsc:
         "Encapsulates a TSC"
@@ -21,25 +21,14 @@ def jsonify_top_level_table(root_path):
             self.proficiencies = []
             self._extract()
 
-        def as_json(self):
-            "returns the TSC as a json object"
-
         def _row_data(self, row):
             "returns row data"
             HEADER_COLUMN = 0
             return [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
 
         def _extract(self):
-            """Extracts information from a docx table:
-                  Category
-                  Description
-                  Proficiencies (list)
-                    Level
-                    TSC Code
-                    Knowledge (list)
-                    Abilities (list)
-                    Range of Applications (list)
-            """
+            "Extracts a TSC from a docx table"
+
             # Row indices in the docx table
             INDICES = ["category", "name", "description",
                 "prof.level", "prof.code", "prof.desc",
@@ -47,10 +36,9 @@ def jsonify_top_level_table(root_path):
 
             rows = self.table.rows
 
-            self.name = self._row_data(rows[INDICES.index("name")])
-            self.description = self._row_data(rows[INDICES.index("description")])
-
-            # drop the repeated category cells
+            # drop the repeated category cells for these rows
+            self.name = self._row_data(rows[INDICES.index("name")])[0]
+            self.description = self._row_data(rows[INDICES.index("description")])[0]
             self.category = self._row_data(rows[INDICES.index("category")])[0]
 
             # proficiency rows
@@ -70,24 +58,43 @@ def jsonify_top_level_table(root_path):
                             prof_abilities, prof_apps)
             ]
 
+    class TscEncoder(json.JSONEncoder):
+        "Extends JSON encoding for a TSC"
+        def default(self, obj):  # pylint: disable=E0202
+            if isinstance(obj, Tsc):
+                return {
+                    # match naming to the document
+                    "Name" : obj.name,
+                    "Category" : obj.category,
+                    "Description" : obj.description,
+                    "Proficiencies" : obj.proficiencies
+                }
 
+            # Let the base class default method raise the TypeError
+            return json.JSONEncoder.default(self, obj)
+            
     def get_top_level_table(path):
         "Returns the top level table in the document, if any"
-        doc = docx.Document(path)
-        if doc.tables:
-            print(path)
-            return doc.tables[0]
+        try:
+            doc = docx.Document(path)
+            if doc.tables:
+                print(path)
+                return doc.tables[0]
+        except:
+            print("Warning: Skipping {}".format(path))
         return None
 
-    def table_to_json(table=None):
-        "Converts the table to JSON"
-        if table and table.rows:
-            tsc = Tsc(table)
-            return tsc.as_json()
-
+    # main logic
+    tscs = []
     for path in glob.glob("{}/**/*.docx".format(root_path),
         recursive=True):
-        print(table_to_json(get_top_level_table(path)))
+        table = get_top_level_table(path)
+        if table and table.rows:
+            tscs.append(Tsc(table))
+
+    with open(json_outfile, mode='w') as o:
+        o.write(json.dumps(tscs, cls=TscEncoder, indent=4,
+            ensure_ascii=True))
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -95,5 +102,7 @@ if __name__ == "__main__":
         "This JSON can be read by something like http://www.jsondata.ninja/")
     parser.add_argument('path',
         help='folder path to look for .docx files')
+    parser.add_argument('--outfile',
+        help="output file path", default="skillsmap_tscs.json")
     args = parser.parse_args()
-    jsonify_top_level_table(args.path)
+    jsonify_tscs(args.path, args.outfile)
