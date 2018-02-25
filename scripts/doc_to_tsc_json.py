@@ -2,6 +2,7 @@
 
 import argparse
 import glob
+import itertools
 import json
 import os
 
@@ -74,23 +75,16 @@ def jsonify_tscs(root_path, json_outfile, json_format):
             # Let the base class default method raise the TypeError
             return json.JSONEncoder.default(self, obj)
 
-    class FlatTscEncoder(json.JSONEncoder):
-        "Extends JSON encoding for a list of TSCs, flattened into proficiencies"
-        # Suppress false positive pylint "hidden" warning
-        def default(self, obj):  # pylint: disable=E0202
-            if all(isinstance(n, Tsc) for n in obj):
-                # we want a flat list and not nested lists
-                result = []
-                for tsc in obj:
-                    result += [{
-                        "TSC Name" : tsc.name,
-                        "TSC Category" : tsc.category,
-                        "TSC Description" : tsc.description,
-                        **p} for p in tsc.proficiencies]
-                return result
-
-            # Let the base class default method raise the TypeError
-            return json.JSONEncoder.default(self, obj)
+    def flatten_tscs(tscs):
+        "Flattens a list of TSCs into proficiencies"
+        return list(itertools.chain.from_iterable(
+            [[{
+                "TSC Name" : tsc.name,
+                "TSC Category" : tsc.category,
+                "TSC Description" : tsc.description,
+                **p} for p in tsc.proficiencies]
+            for tsc in tscs]
+        ))
 
     def get_top_level_table(path):
         "Returns the top level table in the document, if any"
@@ -113,10 +107,8 @@ def jsonify_tscs(root_path, json_outfile, json_format):
 
     with open(json_outfile, mode='w') as o:
         if json_format == "tabular":
-            encoder = FlatTscEncoder
-        else:
-            encoder = TscEncoder
-        o.write(json.dumps(tscs, cls=encoder, indent=4,
+            tscs = flatten_tscs(tscs)
+        o.write(json.dumps(tscs, cls=TscEncoder, indent=4,
             ensure_ascii=True))
 
 if __name__ == "__main__":
@@ -125,11 +117,11 @@ if __name__ == "__main__":
     parser.add_argument('path',
         help='folder path to look for .docx files')
     parser.add_argument('--outfile',
-        help="output file path (default: skillsmap_tscs.json)",
-        default="skillsmap_tscs.json")
+        help="output file path (default: skillsmap_table.json)",
+        default="skillsmap_table.json")
     parser.add_argument('--format',
-        help="determines the json output format (default: nested)",
+        help="determines the json output format (default: tabular)",
         choices=["nested", "tabular"],
-        default="nested")
+        default="tabular")
     args = parser.parse_args()
     jsonify_tscs(args.path, args.outfile, args.format)
