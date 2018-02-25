@@ -120,7 +120,8 @@ if __name__ == "__main__":
         help="output file path (default: skillsmap_table.json)",
         default="skillsmap_table.json")
     parser.add_argument('--format',
-        help="determines the json output format (default: tabular)",
+        help="determines the json output format (default: tabular).\n"
+        "nested: grouped by TSCs, tabular: flat list of proficiencies",
         choices=["nested", "tabular"],
         default="tabular")
     args = parser.parse_args()
