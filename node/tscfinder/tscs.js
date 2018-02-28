@@ -3,9 +3,6 @@ const ss = require("sentence-similarity");
 const _ = require('underscore-node');
 
 // TODO:
-// input sentence as post request
-// componentize
-// Mocha test
 // CI/CD
 // try natural
 
