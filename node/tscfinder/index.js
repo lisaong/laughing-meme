@@ -1,10 +1,18 @@
 const express = require('express')
+const bodyParser = require('body-parser');
 const tscFinder = require('./tscs');
 
 const app = express()
+app.set('view engine', 'pug')
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
-    let input = "Hello world";
+    res.render('index', { title: 'TSC Finder', message: 'Enter your description to find TSCs using semantic analysis.' })
+});
+
+app.post('/', (req, res) => {
+    let input = req.body.text;
     tscFinder.getTopN(input, 5).then(function (result, err) {
         if (err) {
             res.send(err);
@@ -12,6 +20,6 @@ app.get('/', (req, res) => {
             res.send(result);
         }
     });
-})
+});
 
 app.listen(3000, () => console.log('Example app listening on port 3000!'))
