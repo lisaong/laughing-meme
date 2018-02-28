@@ -1,7 +1,14 @@
 var ss = require("sentence-similarity")
 let similarity = ss.sentenceSimilarity;
 let similarityScore = ss.similarityScore;
- 
+
+// TODO:
+// Load json entries
+// Mocha test
+// CI/CD
+// input sentence
+// try natural
+
 let s1 = "Process my data".split(" ")
 let s2 = "Data design principles and strategies\nDatabase modelling techniques\nFunctions and implications of data parameters and fields\nProcesses for development of database schemas\nData warehousing concepts and methodologies".split(" ")
  
