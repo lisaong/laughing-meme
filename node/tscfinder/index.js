@@ -1,49 +1,13 @@
-const fetch = require("node-fetch");
-const ss = require("sentence-similarity");
-const _ = require('underscore-node');
+const express = require('express')
+const tscFinder = require('./tscs');
 
-// TODO:
-// input sentence as post request
-// componentize
-// Mocha test
-// CI/CD
-// try natural
+const app = express()
 
-// Load json entries
-const getTopTscMatches = async (input) => {
-    try {
-        const url = "https://raw.githubusercontent.com/lisaong/data/master/tscs/skillsmap_table.json";
-        const response = await fetch(url);
-        const json = await response.json();
+app.get('/', (req, res) => {
 
-        getTopMatches(json, input);
+    let input = "Hello world";
+    let result = await tscFinder.getTopTscMatches(input);
+    res.send();
+})
 
-    } catch (error) {
-        console.log(error);
-    }
-}
-
-function getTopMatches(data, input) {
-    const similarity = ss.sentenceSimilarity;
-    const similarityScore = ss.similarityScore;
-    
-    const winkOpts = { f: similarityScore.winklerMetaphone, options : {threshold: 0} };
-
-    let tscs = [];
-    data.forEach(element => {
-        let knowledge = element.Knowledge.split(" ")
-        let abilities = element.Abilities.split(" ")
-        let splitInput = input.split(" ");
-
-        let score = similarity(splitInput, knowledge, winkOpts).score;
-        tscs.push({"score": score, "tsc" : element });
-        score = similarity(splitInput, abilities, winkOpts).score;
-        tscs.push({"score": score, "tsc" : element });
-    });
-
-    // sort by highest scores
-    console.log(_.sortBy(tscs, 'score').reverse().slice(0, 10));
-}
-
-let input = "Hello world";
-getTopTscMatches(input);
+app.listen(3000, () => console.log('Example app listening on port 3000!'))
