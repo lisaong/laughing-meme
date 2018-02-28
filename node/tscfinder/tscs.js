@@ -10,7 +10,7 @@ const _ = require('underscore-node');
 // try natural
 
 // Load json entries
-async function getTopTscMatches(input) {
+exports.getTopTscMatches = async function(input) {
     try {
         const url = "https://raw.githubusercontent.com/lisaong/data/master/tscs/skillsmap_table.json";
         const response = await fetch(url);
