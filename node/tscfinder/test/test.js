@@ -1,14 +1,19 @@
 const assert = require('assert');
 const tscFinder = require('../tscs');
 
-console.log(tscFinder);
-
-describe('getTopMatches', function() {
-  describe('#shouldFindScores()', function() {
-    it('should find at least 1 score', function() {
+describe('tscFinder', function() {
+  describe('#getTopN()', function() {
+    it('should find at least 1 score', function(done) {
         const input = "Hello world";
-        const result = tscFinder.getTopTscMatches(input);
-        assert.equal(result.length > 0, true);
+        tscFinder.getTopN(input, 5).then(function (result, err) {
+            if (err) {
+                done(err);
+            } else {
+                assert.equal(result.length, 5);
+                assert.equal(result[0].score > 0, true);
+                done();
+            }
+        });
     });
   });
 })

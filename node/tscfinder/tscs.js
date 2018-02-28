@@ -10,23 +10,23 @@ const _ = require('underscore-node');
 // try natural
 
 // Load json entries
-exports.getTopTscMatches = async function(input) {
+exports.getTopN = async function(input, count) {
     try {
         const url = "https://raw.githubusercontent.com/lisaong/data/master/tscs/skillsmap_table.json";
         const response = await fetch(url);
         const json = await response.json();
 
-        return getTopMatches(json, input);
+        return getTopMatches(json, input, count);
 
     } catch (error) {
         console.log(error);
     }
 }
 
-function getTopMatches(data, input) {
+function getTopMatches(data, input, n) {
     const similarity = ss.sentenceSimilarity;
     const similarityScore = ss.similarityScore;
-    
+
     const winkOpts = { f: similarityScore.winklerMetaphone, options : {threshold: 0} };
 
     let tscs = [];
@@ -42,5 +42,5 @@ function getTopMatches(data, input) {
     });
 
     // sort by highest scores
-    console.log(_.sortBy(tscs, 'score').reverse().slice(0, 10));
+    return _.sortBy(tscs, 'score').reverse().slice(0, n);
 }
