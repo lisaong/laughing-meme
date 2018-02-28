@@ -1,0 +1,7 @@
+extend layout
+block content
+  h4= message
+  form(action='/', method='POST')
+    p
+      textarea(rows="6" cols="150" name="text")
+    input(type='submit', value='Submit')

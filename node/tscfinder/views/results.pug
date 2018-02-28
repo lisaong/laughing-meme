@@ -1,0 +1,9 @@
+extend layout
+block content
+    h3= message
+    section.main-content
+        p=input
+    section#one.wrapper
+        ul.checklist
+            for item in results
+                li= item.score + " " + item.tsc
