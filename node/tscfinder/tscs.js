@@ -36,9 +36,10 @@ function getTopMatches(data, input, n) {
         let splitInput = input.split(" ");
 
         let score = similarity(splitInput, knowledge, winkOpts).score;
-        tscs.push({"score": score, "tsc" : element });
+        tsc = JSON.stringify(element)
+        tscs.push({"score": score, "tsc" : tsc });
         score = similarity(splitInput, abilities, winkOpts).score;
-        tscs.push({"score": score, "tsc" : element });
+        tscs.push({"score": score, "tsc" : tsc });
     });
 
     // sort by highest scores

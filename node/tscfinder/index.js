@@ -10,16 +10,24 @@ app.use('/assets', express.static('assets'))
 app.use('/images', express.static('images'))
 
 app.get('/', (req, res) => {
-    res.render('index', { title: 'TSC Finder', message: 'Enter your description to find TSCs using semantic analysis.' })
+    res.render('index', {
+        title: 'TSC Finder',
+        message: 'Enter your description to find TSCs using semantic analysis.'
+    })
 });
 
 app.post('/', (req, res) => {
     let input = req.body.text;
-    tscFinder.getTopN(input, 5).then(function (result, err) {
+    const n = 5;
+    tscFinder.getTopN(input, n).then(function (results, err) {
         if (err) {
             res.send(err);
         } else {
-            res.send(result);
+            res.render('results', {
+                title: 'TSC Finder Results',
+                message: 'Top ' + n + ' results',
+                input: 'Query: ' + input,
+                results: results })
         }
     });
 });
