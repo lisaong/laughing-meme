@@ -1,17 +1,41 @@
-var ss = require("sentence-similarity")
-let similarity = ss.sentenceSimilarity;
-let similarityScore = ss.similarityScore;
+const fetch = require("node-fetch");
+const ss = require("sentence-similarity")
 
 // TODO:
-// Load json entries
 // Mocha test
 // CI/CD
 // input sentence
 // try natural
 
-let s1 = "Process my data".split(" ")
-let s2 = "Data design principles and strategies\nDatabase modelling techniques\nFunctions and implications of data parameters and fields\nProcesses for development of database schemas\nData warehousing concepts and methodologies".split(" ")
- 
-let winkOpts = { f: similarityScore.winklerMetaphone, options : {threshold: 0} }
- 
-console.log(similarity(s1,s2,winkOpts))
+// Load json entries
+const url = "https://raw.githubusercontent.com/lisaong/data/master/tscs/skillsmap_table.json";
+
+const getLocation = async url => {
+    try {
+        const response = await fetch(url)
+        const json = await response.json()
+
+        let input = "".split(" ")
+        getTopMatches(json, input)
+
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+function getTopMatches(data, input) {
+    const similarity = ss.sentenceSimilarity;
+    const similarityScore = ss.similarityScore;
+    
+    let winkOpts = { f: similarityScore.winklerMetaphone, options : {threshold: 0} }
+
+    let scores = {}
+    data.forEach(element => {
+        
+    });
+
+    console.log(similarity(s1,s2,winkOpts))
+
+}
+
+getLocation(url)
