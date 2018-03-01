@@ -4,6 +4,11 @@ block content
     section.main-content
         p=input
     section#one.wrapper
-        ul.checklist
+        table
+            tr
+                th Score
+                th TSC
             for item in results
-                li= item.score + " " + item.tsc
+                tr
+                    th= item.score
+                    th= item.tsc
