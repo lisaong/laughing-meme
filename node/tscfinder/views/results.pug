@@ -4,6 +4,22 @@ block content
     section.main-content
         p=input
     section#one.wrapper
-        ul.checklist
+        table
+            tr
+                th Score
+                th TSC Name
+                th Category
+                th Level
+                th Description
+                th Knowledge
+                th Abilities
             for item in results
-                li= item.score + " " + item.tsc
+                //- indentation matches the top level tr above
+                tr
+                    td= item.score
+                    td= item.tsc.name
+                    td= item.tsc.category
+                    td= item.tsc.level
+                    td= item.tsc.description
+                    td= item.tsc.knowledge
+                    td= item.tsc.abilities

@@ -18,7 +18,7 @@ app.get('/', (req, res) => {
 
 app.post('/', (req, res) => {
     let input = req.body.text;
-    const n = 5;
+    const n = 20;
     tscFinder.getTopN(input, n).then(function (results, err) {
         if (err) {
             res.send(err);

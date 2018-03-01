@@ -4,8 +4,10 @@ const tscFinder = require('../tscs');
 describe('tscFinder', function() {
   describe('#getTopN()', function() {
     it('should find at least 1 score', function(done) {
-        const input = "Hello world";
-        tscFinder.getTopN(input, 5).then(function (result, err) {
+        // query can be slow
+        this.timeout(20000); // msec
+
+        tscFinder.getTopN("Hello world", 5).then(function (result, err) {
             if (err) {
                 done(err);
             } else {
