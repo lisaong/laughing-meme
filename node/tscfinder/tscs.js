@@ -44,8 +44,8 @@ function getTopMatches(data, input, n) {
             level: element["level"],
             code: element["TSC code"],
             proficiency: element["TSC Proficiency Description"],
-            knowledge: element["Knowledge"],
-            abilities: element["Abilities"],
+            knowledge: element["Knowledge"].replace(/\n/g, "; "),
+            abilities: element["Abilities"].replace(/\n/g, "; "),
             applications: element["Range of Applications"]
         }
         tscs.push({"score": score, "tsc" : tsc });
