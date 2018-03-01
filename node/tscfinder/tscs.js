@@ -32,10 +32,22 @@ function getTopMatches(data, input, n) {
         let abilities = element.Abilities.split(" ")
         let splitInput = input.split(" ");
 
-        let score = similarity(splitInput, knowledge, winkOpts).score;
-        tsc = JSON.stringify(element)
-        tscs.push({"score": score, "tsc" : tsc });
-        score = similarity(splitInput, abilities, winkOpts).score;
+        let score = similarity(splitInput, knowledge, winkOpts).score +
+                    similarity(splitInput, abilities, winkOpts).score
+
+        // keys contain spaces to match the source documents,
+        // make them friendly for accessors
+        tsc = {
+            name: element["TSC Name"],
+            category: element["TSC Category"],
+            description: element["TSC Description"],
+            level: element["level"],
+            code: element["TSC code"],
+            proficiency: element["TSC Proficiency Description"],
+            knowledge: element["Knowledge"],
+            abilities: element["Abilities"],
+            applications: element["Range of Applications"]
+        }
         tscs.push({"score": score, "tsc" : tsc });
     });
 

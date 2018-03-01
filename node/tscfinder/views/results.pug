@@ -7,8 +7,18 @@ block content
         table
             tr
                 th Score
-                th TSC
+                th TSC Name
+                th Category
+                th Level
+                th Description
+                th Knowledge
+                th Abilities
             for item in results
                 tr
                     th= item.score
-                    th= item.tsc
+                    th= item.tsc.name
+                    th= item.tsc.category
+                    th= item.tsc.level
+                    th= item.tsc.description
+                    th= item.tsc.knowledge
+                    th= item.tsc.abilities
