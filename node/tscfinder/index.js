@@ -32,4 +32,4 @@ app.post('/', (req, res) => {
     });
 });
 
-app.listen(3000, () => console.log('Example app listening on port 3000!'))
+app.listen(3000, () => console.log('Running! Go to http://localhost:3000 from your browser.'))
