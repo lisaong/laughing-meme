@@ -14,8 +14,9 @@ def jsonify_tscs(root_path, json_outfile, json_format):
 
     class Tsc:
         "Encapsulates a TSC"
-        def __init__(self, table):
-            self.table = table
+        def __init__(self, tables):
+            self.tables = tables
+            self.row_offsets = []
             self.name = None
             self.category = None
             self.description = None
@@ -27,6 +28,19 @@ def jsonify_tscs(root_path, json_outfile, json_format):
             HEADER_COLUMN = 0
             return [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
 
+        def _row(self, index):
+            # Initialize the offsets
+            if not self.row_offsets:
+                offset = 0
+                for table in self.tables:
+                    offset = offset + len(table.rows)
+                    self.row_offsets.append(offset)
+
+            for i, offset in enumerate(self.row_offsets):
+                if index < offset:
+                    return self.tables[i].rows[index % offset]
+            raise IndexError("{} is out of range".format(index))
+
         def _extract(self):
             "Extracts a TSC from a docx table"
 
@@ -35,20 +49,18 @@ def jsonify_tscs(root_path, json_outfile, json_format):
                 "prof.level", "prof.code", "prof.desc",
                 "prof.knowledge",  "prof.abilities", "prof.apps"]
 
-            rows = self.table.rows
-
             # drop the repeated category cells for these rows
-            self.name = self._row_data(rows[INDICES.index("name")])[0]
-            self.description = self._row_data(rows[INDICES.index("description")])[0]
-            self.category = self._row_data(rows[INDICES.index("category")])[0]
+            self.name = self._row_data(self._row(INDICES.index("name")))[0]
+            self.description = self._row_data(self._row(INDICES.index("description")))[0]
+            self.category = self._row_data(self._row(INDICES.index("category")))[0]
 
             # proficiency rows
-            prof_level = self._row_data(rows[INDICES.index("prof.level")])
-            prof_code = self._row_data(rows[INDICES.index("prof.code")])
-            prof_desc = self._row_data(rows[INDICES.index("prof.desc")])
-            prof_knowledge = self._row_data(rows[INDICES.index("prof.knowledge")])
-            prof_abilities = self._row_data(rows[INDICES.index("prof.abilities")])
-            prof_apps = self._row_data(rows[INDICES.index("prof.apps")])
+            prof_level = self._row_data(self._row(INDICES.index("prof.level")))
+            prof_code = self._row_data(self._row(INDICES.index("prof.code")))
+            prof_desc = self._row_data(self._row(INDICES.index("prof.desc")))
+            prof_knowledge = self._row_data(self._row(INDICES.index("prof.knowledge")))
+            prof_abilities = self._row_data(self._row(INDICES.index("prof.abilities")))
+            prof_apps = self._row_data(self._row(INDICES.index("prof.apps")))
 
             # match naming to the document
             self.proficiencies = [{ "level" : level, "TSC code" : code, \
@@ -86,13 +98,13 @@ def jsonify_tscs(root_path, json_outfile, json_format):
             for tsc in tscs]
         ))
 
-    def get_top_level_table(path):
-        "Returns the top level table in the document, if any"
+    def get_top_level_tables(path):
+        "Returns the top level tables in the document, if any"
         try:
             doc = docx.Document(path)
             if doc.tables:
                 print(path)
-                return doc.tables[0]
+                return doc.tables
         except:
             print("WARNING: Skipping invalid document {}".format(path))
         return None
@@ -101,9 +113,9 @@ def jsonify_tscs(root_path, json_outfile, json_format):
     tscs = []
     for path in glob.glob("{}/**/*.docx".format(root_path),
         recursive=True):
-        table = get_top_level_table(path)
-        if table and table.rows:
-            tscs.append(Tsc(table))
+        tables = get_top_level_tables(path)
+        if tables:
+            tscs.append(Tsc(tables))
 
     with open(json_outfile, mode='w') as o:
         if json_format == "tabular":
