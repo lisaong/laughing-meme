@@ -20,13 +20,16 @@ def jsonify_tscs(root_path, json_outfile, json_format):
             self.name = None
             self.category = None
             self.description = None
+            self.num_levels = 0
             self.proficiencies = []
             self._extract()
 
         def _row_data(self, row):
-            "returns row data"
-            HEADER_COLUMN = 0
-            return [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
+            "returns row data, or empty columns if row is not defined"
+            if row:
+                HEADER_COLUMN = 0
+                return [cell.text for cell in row.cells[HEADER_COLUMN+1:]]
+            return [""] * self.num_levels
 
         def _row(self, index):
             # Initialize the offsets
@@ -42,7 +45,8 @@ def jsonify_tscs(root_path, json_outfile, json_format):
                     return self.tables[i].rows[index - prev_offset]
                 prev_offset = offset
 
-            raise IndexError("{} is out of range".format(index))
+            print("WARNING: index {} out of range, treating as empty row".format(index))
+            return None
 
         def _extract(self):
             "Extracts a TSC from a docx table"
@@ -59,6 +63,7 @@ def jsonify_tscs(root_path, json_outfile, json_format):
 
             # proficiency rows
             prof_level = self._row_data(self._row(INDICES.index("prof.level")))
+            self.num_levels = len(prof_level)
             prof_code = self._row_data(self._row(INDICES.index("prof.code")))
             prof_desc = self._row_data(self._row(INDICES.index("prof.desc")))
             prof_knowledge = self._row_data(self._row(INDICES.index("prof.knowledge")))
