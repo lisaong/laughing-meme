@@ -10,7 +10,10 @@ import os
 import docx
 
 def jsonify_tscs(root_path, json_outfile, json_format):
-    """Extracts TSCs from multiple docx files into a json file"""
+    """Extracts TSCs from multiple docx files into a json file
+       If TSCs are in PDF format, first convert them to docx using Acrobat DC
+       Actions: https://forums.adobe.com/thread/1908764
+    """
 
     class Tsc:
         "Encapsulates a TSC"
