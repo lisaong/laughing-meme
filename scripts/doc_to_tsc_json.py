@@ -36,9 +36,12 @@ def jsonify_tscs(root_path, json_outfile, json_format):
                     offset = offset + len(table.rows)
                     self.row_offsets.append(offset)
 
+            prev_offset = 0
             for i, offset in enumerate(self.row_offsets):
                 if index < offset:
-                    return self.tables[i].rows[index % offset]
+                    return self.tables[i].rows[index - prev_offset]
+                prev_offset = offset
+
             raise IndexError("{} is out of range".format(index))
 
         def _extract(self):
