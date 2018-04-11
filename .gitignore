@@ -1,4 +1,5 @@
 .vscode
+*.log
 output
 node_modules/
 
