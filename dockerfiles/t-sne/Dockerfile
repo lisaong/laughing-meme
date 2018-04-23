@@ -1,4 +1,4 @@
-# Dockerfile for python 2.7 anaconda with t-sne
+# Dockerfile for Python 2.7 Anaconda with t-SNE
 
 FROM alfakini/python-anaconda:latest
 
@@ -8,7 +8,7 @@ RUN apt-get update --fix-missing && \
         libatlas-base-dev
 
 # word2vec
-RUN git clone https://github.com/dominiek/word2vec-explorer
+RUN git clone https://github.com/lisaong/word2vec-explorer
 
 # conda
 RUN /opt/anaconda/bin/conda create -y -n py27 python=2.7 anaconda
