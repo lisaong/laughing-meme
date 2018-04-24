@@ -1,7 +1,7 @@
 ## Build Docker image
 
 ```
-docker build -t lisaong/anaconda-tsne .
+sudo docker build -t lisaong/anaconda-tsne .
 ```
 
 ## Run Docker image
@@ -10,7 +10,7 @@ Where Google News model is downloaded from https://github.com/dominiek/word2vec-
 and unzipped to /home/lisaong/data or a similar location
 
 ```
-docker run -i -t -v=/home/lisaong/data:/data -p 18080:8080 lisaong/anaconda-tsne /bin/bash -c "source activate py27 && LD_PRELOAD=/opt/anaconda/lib/libmkl_core.so word2vec-explorer/explore /data/GoogleNews-vectors-negative300.bin"
+sudo docker run -i -t -v=/home/lisaong/data:/data -p 18080:8080 lisaong/anaconda-tsne /bin/bash -c "source activate py27 && LD_PRELOAD=/opt/anaconda/lib/libmkl_core.so word2vec-explorer/explore /data/GoogleNews-vectors-negative300.bin"
 ```
 
 You should see something like this (takes a few minutes):

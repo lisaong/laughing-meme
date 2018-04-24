@@ -13,5 +13,13 @@ RUN git clone https://github.com/lisaong/word2vec-explorer
 # conda
 RUN /opt/anaconda/bin/conda create -y -n py27 python=2.7 anaconda
 RUN /bin/bash -c "source /opt/anaconda/bin/activate py27 \
-    && pip install numpy==1.10.4 Cython==0.23.4 tsne==0.1.5 routes \
     && pip install -r word2vec-explorer/requirements.txt"
+
+# node
+RUN apt-get update --fix-missing && \
+    apt-get install -y \
+        npm \
+        node
+RUN cd word2vec-explorer && \
+    npm config set registry="http://registry.npmjs.org/" && \
+    npm install bootstrap@3.3.6
