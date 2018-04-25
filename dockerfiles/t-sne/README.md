@@ -27,3 +27,5 @@ prepending /opt/anaconda/envs/py27/bin to PATH
 [23/Apr/2018:01:46:17] ENGINE Serving on http://127.0.0.1:8080
 [23/Apr/2018:01:46:17] ENGINE Bus STARTED
 ```
+
+Once the container is up, access http://localhost:18080 from your host machine.
