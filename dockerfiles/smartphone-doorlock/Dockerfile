@@ -29,7 +29,7 @@ RUN make \
 
 # project
 WORKDIR /
-RUN git clone https://github.com/lisaong/Smartphone-Doorlock.git -b token-env
+RUN git clone https://github.com/lisaong/Smartphone-Doorlock.git
 WORKDIR /Smartphone-Doorlock
 RUN npm install
 WORKDIR /
