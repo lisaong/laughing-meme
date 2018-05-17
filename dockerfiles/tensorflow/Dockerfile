@@ -24,10 +24,12 @@ COPY jupyter_notebook_config.py /root/.jupyter/
 COPY run_jupyter.sh /
 RUN chmod 777 /run_jupyter.sh
 
-# TensorFlow
+# TensorFlow, Keras
 RUN /bin/bash -c "source activate base" \
     && pip install --ignore-installed --upgrade \
-        https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl
+        https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl \
+        keras \
+        pillow
 
 # TensorBoard
 EXPOSE 6006
