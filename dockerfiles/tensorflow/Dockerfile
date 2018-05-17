@@ -10,8 +10,8 @@ RUN apt-get update \
 
 # Jupyter
 RUN /bin/bash -c "source activate base" \
-    && pip3 install --upgrade pip \
-    && pip3 --no-cache-dir install \
+    && pip install --upgrade pip \
+    && pip --no-cache-dir install \
         ipykernel \
         jupyter \
     && python3 -m ipykernel.kernelspec
@@ -26,7 +26,7 @@ RUN chmod 777 /run_jupyter.sh
 
 # TensorFlow
 RUN /bin/bash -c "source activate base" \
-    && pip3 install --ignore-installed --upgrade \
+    && pip install --ignore-installed --upgrade \
         https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.8.0-cp36-cp36m-linux_x86_64.whl
 
 # TensorBoard
